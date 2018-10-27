@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SpaceInvader</title>
+    <script src="/js/classess.js"></script>
+    <script src="/js/js.js"></script>
+    <script src="/js/jquery-3.3.1.min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!--<link rel="stylesheet" th:href="@{/css/css.css}">-->
+    <link rel="stylesheet" th:href="@{/css/game.css}"/>
+
+</head>
+<body>
+
+<div class="container">
+
+    <form th:action="@{/logout}" method="get">
+        <button class="btn btn-md btn-danger btn-block" name="registration" onclick="gameOver()"
+                type="Submit">Logout
+        </button>
+    </form>
+    <div class="panel-group" style="margin-top:10px">
+
+        <div class="body">
+
+            <div class="header">
+                <div class="timer" id="timer">
+                    00:00:00
+                </div>
+                <div id="user">
+                    <p>User: <p th:utext="${principal}" id="principal"></p></p>
+                    <p id="user-result"></p>
+                </div>
+                <div id="start">
+                    <button onclick="startGame()" id="startButton">Start</button>
+                </div>
+                <div id="best-time">
+                    <p class="p">Best time: </p>
+                    <p id="user-best-time"></p>
+                </div>
+                <div id="best-result">
+                    <p>Best result: </p>
+                    <p id="user-best-result"></p>
+                </div>
+                <div id="result">
+                    0
+                </div>
+            </div>
+            <div id="game">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

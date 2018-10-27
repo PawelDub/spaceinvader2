@@ -1,0 +1,133 @@
+.container {
+    width: 95%;
+}
+
+canvas {
+    background-color: aqua;
+    border: 1px solid #d3d3d3;
+    margin: auto;
+}
+
+#canvas-elements {
+    display: block;
+}
+
+#game {
+    width: min-content;
+    margin: auto;
+}
+
+#game-over-frame {
+    margin: 35% auto;
+}
+
+.header {
+    height: 50px;
+    background-color: aquamarine;
+    display: flex;
+    width: 100%;
+}
+
+.records {
+    height: 50px;
+}
+
+#main-time {
+    height: 100%;
+    margin: 0;
+    width: 150px;
+    background-color: blue;
+}
+
+.timer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: yellowgreen;
+    height: 100%;
+    float: left;
+    margin: 0;
+    width: 10%;
+    font-style: italic bold
+}
+
+.p {
+    margin: 2%;
+}
+
+#start {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: yellowgreen;
+    height: 100%;
+    margin: auto;
+    width: 10%;
+    font-style: italic bold
+}
+
+#result {
+    width: 5%;
+    height: 100%;
+    float: right;
+    background-color: blueviolet;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#stop_timer {
+    background-color: pink;
+    height: 50%;
+    margin: 0;
+    padding: 0;
+    float: left;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.newElement {
+    color: blueviolet;
+    height: 50px;
+    margin: 2% auto;
+    background-color: yellow;
+    width: max-content;
+    padding: 2%;
+    font-size: -webkit-xxx-large;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#user, #best-result, #best-time {
+    width: 20%;
+    margin: auto;
+    justify-content: left;
+    align-items: center;
+    background-color: coral;
+    display: flex;
+    padding-left: 1%;
+}
+
+#result-table {
+    border: double;
+    border-collapse: collapse;
+    margin: 10% auto;
+    font-size: 36px;
+}
+
+#result-table td {
+    border: 1px solid black;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#result-table th {
+    border: 2px solid black;
+    text-align: center;
+    vertical-align: middle;
+}
