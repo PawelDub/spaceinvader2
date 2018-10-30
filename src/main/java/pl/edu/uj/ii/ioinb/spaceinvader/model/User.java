@@ -1,5 +1,6 @@
 package pl.edu.uj.ii.ioinb.spaceinvader.model;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "user_id")
+    @ApiModelProperty(notes = "The database generated product ID")
     private int id;
 
     @Column(name = "email")
@@ -44,9 +46,6 @@ public class User {
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
-
-//    @OneToMany(mappedBy="user")
-//    private Set<GameResult> results;
 
     public User() {
     }
@@ -114,5 +113,18 @@ public class User {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", name='" + name + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", active=" + active +
+                ", roles=" + roles +
+                '}';
     }
 }

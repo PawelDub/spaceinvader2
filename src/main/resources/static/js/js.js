@@ -12,20 +12,16 @@ let aliens = [];
 let activeBulet = true;
 let bulet;
 let resultTime;
-let bestResultTime;
 let result;
-let bestResult;
 let timerVar;
 let totalSeconds;
+let userEmail;
+let bestResultTime;
+let bestResult;
 
 let basePath = "http://localhost:8080";
 
 let resultList;
-// let resultList = [
-//     {name: "User_T_1", resultTime: "00:25:25", result: "56"},
-//     {name: "User_T_2", resultTime: "00:25:25", result: "56"},
-//     {name: "User_T_3", resultTime: "00:25:25", result: "56"}
-// ];
 
 function prepareCanvas() {
     if (!$("canvas").get(0)) {
@@ -40,6 +36,7 @@ function prepareCanvas() {
 
 function startGame() {
     prepareCanvas();
+    userEmail = $("#principal").get(0).innerText;
     totalSeconds = 0;
     result = 0;
     resultTime = 0;
@@ -47,8 +44,6 @@ function startGame() {
     canvasTank = $("#tank").get(0);
     buletCanvas = $("#bulet").get(0);
     boomCanvas = $("#boom").get(0);
-    bestResult = getBestResult();
-    bestResultTime = getBestResultTime();
     tank = new Tank(canvas.clientWidth / 2, canvas.clientHeight - 50);
     canvas2d.drawImage(canvasTank, tank.x, tank.y, 40, 40);
     timerVar = setInterval(countTimer, 1000);
@@ -74,7 +69,7 @@ function drawCanvas() {
 }
 
 function startAliens() {
-    for (var a = 0; a < 3; a++) {
+    for (let a = 0; a < 3; a++) {
         aliens["alien_" + a] = new Alien();
         aliens["alien_" + a].start();
     }
@@ -87,51 +82,29 @@ function gameOver() {
     if (bulet) {
         bulet.kill();
     }
-    let user = {
-        name: $("#principal").get(0).innerText,
-        resultTime: resultTime,
-        result: result
-    };
-    user.resultTime = $("#timer").get(0).innerText;
-    user.result = $("#result").get(0).innerText;
+
+    resultTime = $("#timer").get(0).innerHTML;
+    result = $("#result").get(0).innerHTML;
+
+    saveGame();
+
+    bestResultTime = getBestResultTime();
+    bestResult = getBestResult();
+    resultList = getResults();
+
     $("#startButton").get(0).disabled = false;
     $("#timer").get(0).innerHTML = "00:00:00";
     $("#result").get(0).innerHTML = 0;
-    resultList.saveGame(user);
-    $("#principal").get(0).innerHTML = user.name;
+
+    $("#principal").get(0).innerHTML = userEmail;
     $("p#user-best-time").get(0).innerHTML = bestResultTime;
     $("p#user-best-result").get(0).innerHTML = bestResult;
+
     clearInterval(timerVar);
     gameOverFrame();
-    resultList = getResults();
-    generateResultTable();
+    generateResultTable(resultList);
 }
 
-function saveGame(user) {
-    $.post(basePath + "/user/game/result", user);
-}
-
-function getResults() {
-    $.getJSON(basePath + "/user/game/result", function (data) {
-        resultList = data;
-    });
-}
-
-function finishGame() {
-
-}
-
-function getBestResult() {
-    $.getJSON(basePath + "/bestresult", function (data) {
-        bestResultTime = data;
-    })
-}
-
-function getBestResultTime() {
-    $.getJSON(basePath + "/bestresulttime", function (data) {
-        bestResult = data;
-    })
-}
 
 function alienInterval(alien) {
     alien.alienInter = setInterval(function () {
@@ -160,8 +133,8 @@ function buletInterval(bulet) {
             canvas2d.clearRect(bulet.x, bulet.y, 20, 30)
         }
 
-        var alienArray = [];
-        var buletArray = [];
+        let alienArray = [];
+        let buletArray = [];
 
         for (alien in aliens) {
             for (g = aliens[alien].y; g <= aliens[alien].y + 10; g++) {
@@ -188,11 +161,11 @@ function buletInterval(bulet) {
                     canvas2d.clearRect(alf.object.x, alf.object.y, 40, 40);
                     canvas2d.clearRect(bulet.x, bulet.y, 20, 30);
 
-                    var boom = new Point(bulet.x, bulet.y);
+                    let boom = new Point(bulet.x, bulet.y);
                     canvas2d.drawImage(boomCanvas, boom.x, boom.y, 40, 40);
 
-                    var timeRun = 0;
-                    var boomInterval = setInterval(function () {
+                    let timeRun = 0;
+                    let boomInterval = setInterval(function () {
                         timeRun += 1;
                         if (timeRun == 10) {
                             canvas2d.clearRect(boom.x, boom.y, 40, 40);
@@ -242,9 +215,9 @@ function checkKey(e) {
 
 function countTimer() {
     ++totalSeconds;
-    var hour = Math.floor(totalSeconds / 3600);
-    var minute = Math.floor((totalSeconds - hour * 3600) / 60);
-    var seconds = totalSeconds - (hour * 3600 + minute * 60);
+    let hour = Math.floor(totalSeconds / 3600);
+    let minute = Math.floor((totalSeconds - hour * 3600) / 60);
+    let seconds = totalSeconds - (hour * 3600 + minute * 60);
 
     if (hour.toString().length < 2) {
         hour = "0" + hour
@@ -267,14 +240,126 @@ function randomX() {
 }
 
 
-function generateResultTable() {
+function generateResultTable(resultList) {
     $("#game-over-frame").append(
         `<table id="result-table"><tr><th><p>User</p></th><th><p>Result Time</p></th><th><p>Result</p></th></tr></table>`
-    )
+    );
 
-    for (res of resultList) {
+    for (result of Object.keys(resultList)) {
+        var res = obj[result];
+        console.log("generatetable: " + res)
         $("#result-table").append(
-            `<tr><td>${res.name}</td><td>${res.resultTime}</td><td>${res.result}</td></tr>`
+            `<tr><td>${res.userEmail}</td><td>${res.resultTime}</td><td>${res.result}</td></tr>`
         )
     }
+}
+
+async function saveGame() {
+    let gameResult = {
+        userEmail: userEmail,
+        resultTime: resultTime,
+        result: result
+    };
+    try {
+        await fetch(basePath + "/user/game/result", {
+            method: 'POST',
+            body: JSON.stringify(gameResult),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        // await $.ajax({
+        //     url: basePath + "/user/game/result",
+        //     type: 'POST',
+        //     contentType: "application/json",
+        //     data: JSON.stringify(gameResult),
+        //     dataType: "json"
+        // });
+    } catch (e) {
+        console.log("save game error =======================");
+        console.log(e);
+    }
+}
+
+async function getResults() {
+    console.log("getResult: ================");
+    try {
+        const result =  await fetch(basePath + "/user/game/result").then(res => {
+            var response = JSON.parse(res);
+        console.log("getResult response: " + response);
+            return response.text()
+        })
+            .then((data) => {
+                resolve(data ? JSON.parse(data) : {})
+            })
+            .catch((error) => {
+                console.log("get Result error 1 =======================");
+                reject(error)
+            });
+
+        this.resultList = result;
+        // const result = await $.getJSON(basePath + "/user/game/result", (data) => {
+        //     console.log("getResult: " + data.toString());
+        //     return data;
+        // });
+    } catch (e) {
+        console.log("get Result error 2 =======================");
+        console.log(e);
+    }
+}
+
+async function getBestResult() {
+    console.log("getBestResult ================");
+    const bestResult = await fetch(basePath + "/user/game/bestresult").then(res => {
+        var response = JSON.parse(res);
+        console.log("getBestResult response: " + response);
+        return response.text()
+    })
+        .then((data) => {
+            resolve(data ? JSON.parse(data) : {})
+        })
+        .catch((error) => {
+            console.log("getBestResult error =======================");
+            reject(error)
+        });
+    console.log("bestResult: " + bestResult);
+    this.bestResult = bestResult;
+
+    // $.getJSON(basePath + "/user/game/bestresult", (data) => {
+    //     if (data == null) {
+    //         console.log("getBestResult: null ================");
+    //         return '00:00:00';
+    //     }
+    //     console.log("getBestResult: " + data.toString());
+    //     return data;
+    // });
+}
+
+async function getBestResultTime() {
+    console.log("getBestResultTime ================");
+
+    const bestResultTime = await fetch("/user/game/bestresulttime").then(res => {
+        var response = JSON.parse(res);
+        console.log("getBestResultTime response: " + response);
+        return response.text()
+    })
+        .then((data) => {
+            resolve(data ? JSON.parse(data) : {})
+        })
+        .catch((error) => {
+            console.log("getBestResultTime error =======================");
+            reject(error)
+        });
+
+    console.log("bestResultTime: " + bestResultTime);
+    this.bestResultTime = bestResultTime;
+
+    // $.getJSON(basePath + "/user/game/bestresulttime", (data) => {
+    //     if (data == null) {
+    //         console.log("getBestResultTime null ================");
+    //         return '0'
+    //     }
+    //     console.log("getBestResultTime: " + data.toString());
+    //     return data;
+    // });
 }

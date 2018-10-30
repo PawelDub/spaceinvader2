@@ -71,4 +71,14 @@ public class GameResult {
     public void setResult(Long result) {
         this.result = result;
     }
+
+    @Override
+    public String toString() {
+        return "GameResult{" +
+                "id=" + id +
+                ", userEmail='" + userEmail + '\'' +
+                ", resultTime=" + resultTime +
+                ", result=" + result +
+                '}';
+    }
 }

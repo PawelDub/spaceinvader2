@@ -34,19 +34,22 @@
                     00:00:00
                 </div>
                 <div id="user">
-                    <p>User: <p th:utext="${principal}" id="principal"></p></p>
-                    <p id="user-result"></p>
+                    <p class="p">User:
+                    <p class="p" th:utext="${principal}" id="principal"></p></p>
+                    <p class="p" id="user-result"></p>
                 </div>
                 <div id="start">
                     <button onclick="startGame()" id="startButton">Start</button>
                 </div>
                 <div id="best-time">
-                    <p class="p">Best time: </p>
-                    <p id="user-best-time"></p>
+                    <p class="p">Best time:
+                    <p class="p" id="user-best-time" th:utext="${bestResultTime}"></p>
+                    </p>
                 </div>
                 <div id="best-result">
-                    <p>Best result: </p>
-                    <p id="user-best-result"></p>
+                    <p class="p">Best result:
+                    <p class="p" id="user-best-result" th:utext="${bestResult}"></p>
+                    </p>
                 </div>
                 <div id="result">
                     0

@@ -1,5 +1,7 @@
 package pl.edu.uj.ii.ioinb.spaceinvader.controller;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -7,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import pl.edu.uj.ii.ioinb.spaceinvader.model.Role;
 import pl.edu.uj.ii.ioinb.spaceinvader.model.User;
 import pl.edu.uj.ii.ioinb.spaceinvader.service.UserService;
@@ -14,8 +17,9 @@ import pl.edu.uj.ii.ioinb.spaceinvader.service.UserService;
 import java.security.Principal;
 
 @Controller
+@RequestMapping(value = "/home")
 public class HomeController {
-
+    Logger logger = LogManager.getLogger(HomeController.class);
     private UserService userService;
 
     @Autowired
@@ -23,8 +27,10 @@ public class HomeController {
         this.userService = userService;
     }
 
-    @RequestMapping(value = "/user/home", method = RequestMethod.GET)
+    @RequestMapping(value = "/user", method = RequestMethod.GET)
     public String userHome(Principal principal, Model model) {
+        logger.info("===========Begin request ===============");
+        logger.info("===========URL: /home/user , Method: GET ===============");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findUserByEmail(auth.getName());
 
@@ -33,20 +39,24 @@ public class HomeController {
         if (principal != null) {
             for (Role role : user.getRoles()) {
                 if (role.getRole().equals("ADMIN")) {
-                    return "redirect:/admin/home";
+                    logger.info("User has role: ADMIN");
+                    return "redirect:/home/admin";
                 }
             }
         }
 
         model.addAttribute("name", "Welcome " + user.getName() + " " + user.getLastName() + " (" + user.getEmail() + ")");
-        model.addAttribute("message", "Content Available Only for Users with " + user.getRoles() + " Role");
+        model.addAttribute("message", "Content Available Only for Users with " + user.getRoles().stream().findFirst().get().getRole() + " Role");
         model.addAttribute("principal", principal.getName());
 
+        logger.info("===========End request ===============");
         return view;
     }
 
-    @RequestMapping(value = "/admin/home", method = RequestMethod.GET)
+    @RequestMapping(value = "/admin", method = RequestMethod.GET)
     public String adminhome(Principal principal, Model model) {
+        logger.info("===========Begin request ===============");
+        logger.info("===========URL: /home/admin , Method: GET ===============");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findUserByEmail(auth.getName());
         String view = "admin/adminhome";
@@ -54,30 +64,39 @@ public class HomeController {
         if (principal != null) {
             for (Role role : user.getRoles()) {
                 if (role.getRole().equals("USER")) {
-                    view = "redirect:/user/home";
+                    view = "redirect:/home/user";
+                    logger.info("User has role: USER");
                 }
             }
         }
         model.addAttribute("name", "Welcome " + user.getName() + " " + user.getLastName() + " (" + user.getEmail() + ")");
         model.addAttribute("user", user);
-        model.addAttribute("message", "Content Available Only for Users with " + user.getRoles() + " Role");
+        model.addAttribute("message", "Content Available Only for Users with " + user.getRoles().stream().findFirst().get().getRole() + " Role");
         model.addAttribute("principal", principal.getName());
+        logger.info("===========End request ===============");
         return view;
     }
 
-    @RequestMapping(value = "/home", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public String home(Principal principal) {
+        logger.info("===========Begin request ===============");
+        logger.info("===========URL: /home , Method: GET ===============");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findUserByEmail(auth.getName());
 
         if (principal != null) {
             for (Role role : user.getRoles()) {
                 if (role.getRole().equals("ADMIN")) {
-                    return "redirect:/admin/home";
+                    logger.info("User has role: ADMIN");
+                    logger.info("===========End request ===============");
+                    return "redirect:/home/admin";
                 }
             }
-            return "redirect:/user/home";
+            logger.info("User has role: USER");
+            logger.info("===========End request ===============");
+            return "redirect:/home/user";
         }
+        logger.info("===========End request ===============");
         return "redirect:/login";
     }
 }

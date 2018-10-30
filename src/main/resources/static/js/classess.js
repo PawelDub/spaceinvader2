@@ -60,3 +60,11 @@ class Point {
         this.y = y;
     }
 }
+
+class GameResult {
+    constructor(userName, resultTime, result) {
+        this.userName = userName;
+        this.resultTime = resultTime;
+        this.result = result;
+    }
+}
