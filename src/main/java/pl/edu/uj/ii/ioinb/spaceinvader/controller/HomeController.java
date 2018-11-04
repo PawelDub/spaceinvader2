@@ -9,8 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import pl.edu.uj.ii.ioinb.spaceinvader.model.Role;
+import pl.edu.uj.ii.ioinb.spaceinvader.model.RoleType;
 import pl.edu.uj.ii.ioinb.spaceinvader.model.User;
 import pl.edu.uj.ii.ioinb.spaceinvader.service.UserService;
 
@@ -29,8 +29,6 @@ public class HomeController {
 
     @RequestMapping(value = "/user", method = RequestMethod.GET)
     public String userHome(Principal principal, Model model) {
-        logger.info("===========Begin request ===============");
-        logger.info("===========URL: /home/user , Method: GET ===============");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findUserByEmail(auth.getName());
 
@@ -38,7 +36,7 @@ public class HomeController {
 
         if (principal != null) {
             for (Role role : user.getRoles()) {
-                if (role.getRole().equals("ADMIN")) {
+                if (role.getRole().equals(RoleType.ADMIN)) {
                     logger.info("User has role: ADMIN");
                     return "redirect:/home/admin";
                 }
@@ -49,54 +47,47 @@ public class HomeController {
         model.addAttribute("message", "Content Available Only for Users with " + user.getRoles().stream().findFirst().get().getRole() + " Role");
         model.addAttribute("principal", principal.getName());
 
-        logger.info("===========End request ===============");
         return view;
     }
 
     @RequestMapping(value = "/admin", method = RequestMethod.GET)
     public String adminhome(Principal principal, Model model) {
-        logger.info("===========Begin request ===============");
-        logger.info("===========URL: /home/admin , Method: GET ===============");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findUserByEmail(auth.getName());
         String view = "admin/adminhome";
 
         if (principal != null) {
             for (Role role : user.getRoles()) {
-                if (role.getRole().equals("USER")) {
+                if (role.getRole().equals(RoleType.USER)) {
                     view = "redirect:/home/user";
                     logger.info("User has role: USER");
                 }
             }
+        } else {
+            return "redirect:/";
         }
         model.addAttribute("name", "Welcome " + user.getName() + " " + user.getLastName() + " (" + user.getEmail() + ")");
         model.addAttribute("user", user);
         model.addAttribute("message", "Content Available Only for Users with " + user.getRoles().stream().findFirst().get().getRole() + " Role");
         model.addAttribute("principal", principal.getName());
-        logger.info("===========End request ===============");
         return view;
     }
 
     @RequestMapping(method = RequestMethod.GET)
     public String home(Principal principal) {
-        logger.info("===========Begin request ===============");
-        logger.info("===========URL: /home , Method: GET ===============");
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findUserByEmail(auth.getName());
 
         if (principal != null) {
             for (Role role : user.getRoles()) {
-                if (role.getRole().equals("ADMIN")) {
+                if (role.getRole().equals(RoleType.ADMIN)) {
                     logger.info("User has role: ADMIN");
-                    logger.info("===========End request ===============");
                     return "redirect:/home/admin";
                 }
             }
             logger.info("User has role: USER");
-            logger.info("===========End request ===============");
             return "redirect:/home/user";
         }
-        logger.info("===========End request ===============");
         return "redirect:/login";
     }
 }

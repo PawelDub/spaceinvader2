@@ -22,14 +22,15 @@ public class LoginController {
 
     @RequestMapping(value = {"/", "/login"}, method = RequestMethod.GET)
     public String login(Principal principal) {
-        logger.info("===========Begin request ===============");
-        logger.info("===========Url: / , /login , Method: GET ===============");
         if (principal != null) {
-            logger.info("===========End request ===============");
             return "redirect:/home";
         }
-        logger.info("===========End request ===============");
         return "login";
+    }
+
+    @RequestMapping(value = "/access-denied", method = RequestMethod.GET)
+    public String accessDenied() {
+        return "access-denied";
     }
 
 

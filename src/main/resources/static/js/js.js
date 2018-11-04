@@ -16,12 +16,9 @@ let result;
 let timerVar;
 let totalSeconds;
 let userEmail;
-let bestResultTime;
-let bestResult;
 
 let basePath = "http://localhost:8080";
-
-let resultList;
+let userGamePath = "/user/game";
 
 function prepareCanvas() {
     if (!$("canvas").get(0)) {
@@ -86,23 +83,30 @@ function gameOver() {
     resultTime = $("#timer").get(0).innerHTML;
     result = $("#result").get(0).innerHTML;
 
-    saveGame();
+    saveGame({
+        userEmail: userEmail,
+        resultTime: resultTime,
+        result: result
+    });
 
-    bestResultTime = getBestResultTime();
-    bestResult = getBestResult();
-    resultList = getResults();
+    getBestResultTime().then(result => {
+        $("p#user-best-time").get(0).innerHTML = result;
+    });
+
+    getBestResult().then(result => {
+        $("p#user-best-result").get(0).innerHTML = result;
+    });
 
     $("#startButton").get(0).disabled = false;
     $("#timer").get(0).innerHTML = "00:00:00";
     $("#result").get(0).innerHTML = 0;
 
     $("#principal").get(0).innerHTML = userEmail;
-    $("p#user-best-time").get(0).innerHTML = bestResultTime;
-    $("p#user-best-result").get(0).innerHTML = bestResult;
-
     clearInterval(timerVar);
     gameOverFrame();
-    generateResultTable(resultList);
+    getResults().then(result => {
+        generateResultTable(result);
+    });
 }
 
 
@@ -114,7 +118,7 @@ function alienInterval(alien) {
         if (alien.y >= canvas.clientHeight || result >= 50) {
             gameOver();
         }
-    }, 300)
+    }, 300);
 }
 
 function buletInterval(bulet) {
@@ -191,14 +195,12 @@ function checkKey(e) {
     e = e || window.event;
 
     if (e.keyCode == "37") {
-        // alert("left arrow");
         if (tank.x == 0) return;
         canvas2d.clearRect(tank.x, tank.y, 40, 40);
         tank.img = canvas2d.drawImage(canvasTank, tank.x -= 5, tank.y, 40, 40);
 
     }
     else if (e.keyCode == "39") {
-        // alert("right arrow");
         if (tank.x == canvas.clientWidth) return;
         canvas2d.clearRect(tank.x, tank.y, 40, 40);
         tank.img = canvas2d.drawImage(canvasTank, tank.x += 5, tank.y, 40, 40);
@@ -239,127 +241,59 @@ function randomX() {
     return Math.floor(Math.random() * (canvas.clientWidth - 40)) + 1;
 }
 
-
 function generateResultTable(resultList) {
     $("#game-over-frame").append(
         `<table id="result-table"><tr><th><p>User</p></th><th><p>Result Time</p></th><th><p>Result</p></th></tr></table>`
     );
 
-    for (result of Object.keys(resultList)) {
-        var res = obj[result];
-        console.log("generatetable: " + res)
+    for (res of resultList) {
         $("#result-table").append(
             `<tr><td>${res.userEmail}</td><td>${res.resultTime}</td><td>${res.result}</td></tr>`
         )
     }
 }
 
-async function saveGame() {
-    let gameResult = {
-        userEmail: userEmail,
-        resultTime: resultTime,
-        result: result
-    };
-    try {
-        await fetch(basePath + "/user/game/result", {
-            method: 'POST',
-            body: JSON.stringify(gameResult),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        // await $.ajax({
-        //     url: basePath + "/user/game/result",
-        //     type: 'POST',
-        //     contentType: "application/json",
-        //     data: JSON.stringify(gameResult),
-        //     dataType: "json"
-        // });
-    } catch (e) {
-        console.log("save game error =======================");
-        console.log(e);
-    }
+function saveGame(gameResult) {
+    $.ajax({
+        url: `${basePath}${userGamePath}/result`,
+        type: 'POST',
+        contentType: "application/json",
+        async: false,
+        data: JSON.stringify(gameResult),
+        dataType: "json"
+    });
 }
 
-async function getResults() {
-    console.log("getResult: ================");
-    try {
-        const result =  await fetch(basePath + "/user/game/result").then(res => {
-            var response = JSON.parse(res);
-        console.log("getResult response: " + response);
-            return response.text()
-        })
-            .then((data) => {
-                resolve(data ? JSON.parse(data) : {})
-            })
-            .catch((error) => {
-                console.log("get Result error 1 =======================");
-                reject(error)
-            });
-
-        this.resultList = result;
-        // const result = await $.getJSON(basePath + "/user/game/result", (data) => {
-        //     console.log("getResult: " + data.toString());
-        //     return data;
-        // });
-    } catch (e) {
-        console.log("get Result error 2 =======================");
-        console.log(e);
-    }
+function getResults() {
+    return fetch(`${basePath}${userGamePath}/result`)
+        .then(res => {
+            return res.json()
+        }).then(res => {
+            return res;
+        }).catch(error => {
+            console.log(error)
+        });
 }
 
-async function getBestResult() {
-    console.log("getBestResult ================");
-    const bestResult = await fetch(basePath + "/user/game/bestresult").then(res => {
-        var response = JSON.parse(res);
-        console.log("getBestResult response: " + response);
-        return response.text()
-    })
-        .then((data) => {
-            resolve(data ? JSON.parse(data) : {})
-        })
-        .catch((error) => {
-            console.log("getBestResult error =======================");
-            reject(error)
+function getBestResult() {
+    return fetch(`${basePath}${userGamePath}/bestresult`)
+        .then(data => {
+            return data.json();
+        }).then(res => {
+            return res;
+        }).catch(error => {
+            console.log(error)
         });
-    console.log("bestResult: " + bestResult);
-    this.bestResult = bestResult;
-
-    // $.getJSON(basePath + "/user/game/bestresult", (data) => {
-    //     if (data == null) {
-    //         console.log("getBestResult: null ================");
-    //         return '00:00:00';
-    //     }
-    //     console.log("getBestResult: " + data.toString());
-    //     return data;
-    // });
 }
 
-async function getBestResultTime() {
-    console.log("getBestResultTime ================");
-
-    const bestResultTime = await fetch("/user/game/bestresulttime").then(res => {
-        var response = JSON.parse(res);
-        console.log("getBestResultTime response: " + response);
-        return response.text()
-    })
-        .then((data) => {
-            resolve(data ? JSON.parse(data) : {})
-        })
-        .catch((error) => {
-            console.log("getBestResultTime error =======================");
-            reject(error)
+function getBestResultTime() {
+    return fetch(`${basePath}${userGamePath}/bestresulttime`)
+        .then(res => {
+            return res.json()
+        }).then(res => {
+            return res;
+            // $("p#user-best-time").get(0).innerHTML = res;
+        }).catch(error => {
+            console.log(error)
         });
-
-    console.log("bestResultTime: " + bestResultTime);
-    this.bestResultTime = bestResultTime;
-
-    // $.getJSON(basePath + "/user/game/bestresulttime", (data) => {
-    //     if (data == null) {
-    //         console.log("getBestResultTime null ================");
-    //         return '0'
-    //     }
-    //     console.log("getBestResultTime: " + data.toString());
-    //     return data;
-    // });
 }

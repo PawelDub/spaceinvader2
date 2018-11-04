@@ -1,7 +1,7 @@
 package pl.edu.uj.ii.ioinb.spaceinvader.controller;
 
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -26,19 +26,15 @@ public class RegistrationController {
 
     @RequestMapping(value = "/registration", method = RequestMethod.GET)
     public ModelAndView registration() {
-        logger.info("===========Begin request ===============");
-        logger.info("URL: /registration , Methode: GET");
         ModelAndView modelAndView = new ModelAndView();
         User user = new User();
         modelAndView.addObject("user", user);
         modelAndView.setViewName("registration");
-        logger.info("===========End request ===============");
         return modelAndView;
     }
 
     @RequestMapping(value = "/registration", method = RequestMethod.POST)
     public ModelAndView createNewUser(@Valid User user, BindingResult bindingResult) {
-        logger.info("===========Begin request ===============");
         logger.info("URL: /registration , Methode: POST");
         ModelAndView modelAndView = new ModelAndView();
         User userExists = userService.findUserByEmail(user.getEmail());
@@ -59,7 +55,6 @@ public class RegistrationController {
             modelAndView.setViewName("registration");
 
         }
-        logger.info("===========End request ===============");
         return modelAndView;
     }
 }

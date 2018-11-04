@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.edu.uj.ii.ioinb.spaceinvader.exception.UserNotFoundException;
 import pl.edu.uj.ii.ioinb.spaceinvader.model.GameResult;
 import pl.edu.uj.ii.ioinb.spaceinvader.model.Role;
+import pl.edu.uj.ii.ioinb.spaceinvader.model.RoleType;
 import pl.edu.uj.ii.ioinb.spaceinvader.model.User;
 import pl.edu.uj.ii.ioinb.spaceinvader.service.GameService;
 import pl.edu.uj.ii.ioinb.spaceinvader.service.UserService;
@@ -47,8 +48,6 @@ public class ResultRestController {
             @ApiResponse(code = 400, message = "Data which you are trying to save is incorrect")
     })
     public void saveGameResult(@RequestBody @Valid GameResult result, Principal principal) throws Exception {
-        logger.info("===========Begin request ===============");
-        logger.info("Request begin: URL: /result , Methode: POST" + result.toString());
         checkUser(principal);
         User user = userService.findUserByEmail(result.getUserEmail());
 
@@ -58,14 +57,13 @@ public class ResultRestController {
         }
 
         for (Role role : user.getRoles()) {
-            if (role.getRole().equals("ADMIN")) {
+            if (role.getRole().equals(RoleType.ADMIN)) {
                 logger.error("Trying to write ADMIN result ");
                 throw new UserNotFoundException("You are ADMIN, admin can't write result");
             }
         }
 
         logger.info("Game result: " + result.toString());
-        logger.info("===========End request ===============");
         gameService.save(result);
     }
 
@@ -77,11 +75,8 @@ public class ResultRestController {
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
     })
     public Iterable<GameResult> gameResults(Principal principal) throws Exception {
-        logger.info("===========Begin request ===============");
-        logger.info("Request begin: URL: /result , Methode: GET");
         checkUser(principal);
-        logger.info("===========End request ===============");
-        return gameService.findAllOrderByResultTimeAndResult();
+        return gameService.findAllOrderByResultAndResultTime();
     }
 
     @GetMapping("/bestresulttime")
@@ -92,10 +87,8 @@ public class ResultRestController {
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
     })
     public LocalTime gameBestResultTime(Principal principal) throws Exception {
-        logger.info("===========Begin request ===============");
         logger.info("Request begin: URL: /bestresulttime , Methode: GET");
         checkUser(principal);
-        logger.info("===========End request ===============");
         return gameService.findBestResultTime();
     }
 
@@ -107,10 +100,7 @@ public class ResultRestController {
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
     })
     public Long gameBestResult(Principal principal) throws Exception {
-        logger.info("===========Begin request ===============");
-        logger.info("Request begin: URL: /bestresult , Methode: GET");
         checkUser(principal);
-        logger.info("===========End request ===============");
         return gameService.findBestResult();
     }
 
@@ -120,7 +110,7 @@ public class ResultRestController {
         logger.info("User: " + user.getEmail()+ " is logged with role: " + user.getRoles().stream().findFirst().get().getRole());
         if (principal != null) {
             for (Role role : user.getRoles()) {
-                if (role.getRole().equals("ADMIN")) {
+                if (role.getRole().equals(RoleType.ADMIN)) {
                     logger.error("Admin is logged");
                     throw new UserNotFoundException("You are not user");
                 }

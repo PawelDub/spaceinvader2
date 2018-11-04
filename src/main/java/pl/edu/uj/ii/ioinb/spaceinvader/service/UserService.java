@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.edu.uj.ii.ioinb.spaceinvader.model.Role;
+import pl.edu.uj.ii.ioinb.spaceinvader.model.RoleType;
 import pl.edu.uj.ii.ioinb.spaceinvader.model.User;
 import pl.edu.uj.ii.ioinb.spaceinvader.repository.RoleRepository;
 import pl.edu.uj.ii.ioinb.spaceinvader.repository.UserRepository;
@@ -35,20 +36,9 @@ public class UserService {
     public User saveUser(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setActive(1);
-        Role userRole = roleRepository.findByRole("USER");
+        Role userRole = roleRepository.findByRole(RoleType.USER);
         user.setRoles(new HashSet<Role>(Arrays.asList(userRole)));
         return userRepository.save(user);
     }
-//    public static String encrytePassword(String password) {
-//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-//        return encoder.encode(password);
-//    }
-//        public static void main(String[] args) {
-//        String password = "$2a$10$oKZPLbArNtjLlzPhI3SSN.M7tYhB6q/L9qa7zAQCr2lXG5WeKgj9y";
-//        String encrytedPassword = encrytePassword(password);
-//
-//        System.out.println("Encryted Password: " + encrytedPassword);
-//
-//    }
 
 }
