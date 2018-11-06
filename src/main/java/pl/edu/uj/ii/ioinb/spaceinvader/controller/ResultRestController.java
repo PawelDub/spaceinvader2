@@ -87,7 +87,6 @@ public class ResultRestController {
             @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
     })
     public LocalTime gameBestResultTime(Principal principal) throws Exception {
-        logger.info("Request begin: URL: /bestresulttime , Methode: GET");
         checkUser(principal);
         return gameService.findBestResultTime();
     }

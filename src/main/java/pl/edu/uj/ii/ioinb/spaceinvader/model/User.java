@@ -1,16 +1,12 @@
 package pl.edu.uj.ii.ioinb.spaceinvader.model;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Entity
@@ -25,20 +21,20 @@ public class User {
 
     @Column(name = "email")
     @Email(message = "*Please provide a valid Email")
-    @NotEmpty(message = "*Please provide an email")
+    @NotNull(message = "*Please provide an email")
     private String email;
 
     @Column(name = "password")
     @Length(min = 5, message = "*Your password must have at least 5 characters")
-    @NotEmpty(message = "*Please provide your password")
+    @NotNull(message = "*Please provide your password")
     private String password;
 
     @Column(name = "name")
-    @NotEmpty(message = "*Please provide your name")
+    @NotNull(message = "*Please provide your name")
     private String name;
 
     @Column(name = "last_name")
-    @NotEmpty(message = "*Please provide your last name")
+    @NotNull(message = "*Please provide your last name")
     private String lastName;
 
     @Column(name = "active")

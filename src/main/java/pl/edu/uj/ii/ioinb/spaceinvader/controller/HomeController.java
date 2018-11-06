@@ -41,6 +41,9 @@ public class HomeController {
                     return "redirect:/home/admin";
                 }
             }
+        } else {
+            return "redirect:/";
+
         }
 
         model.addAttribute("name", "Welcome " + user.getName() + " " + user.getLastName() + " (" + user.getEmail() + ")");

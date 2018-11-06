@@ -21,7 +21,7 @@ import java.time.LocalTime;
 @Controller
 @RequestMapping("/user")
 public class GameController {
-    Logger logger = LogManager.getLogger(GameController.class);
+    private Logger logger = LogManager.getLogger(GameController.class);
     private UserService userService;
 
     private GameService gameService;

@@ -25,7 +25,6 @@ public class GameResult {
 
     @NotNull
     @DateTimeFormat(pattern = "kk:mm:ss")
-    @Size(max = 8, min = 8, message = "size should contain 8 chars e.g: '11:12:05'")
     @Column(name = "result_time")
     private LocalTime resultTime;
 
